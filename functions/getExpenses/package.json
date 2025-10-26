@@ -1,0 +1,11 @@
+{
+  "name": "getExpenses",
+  "version": "1.0.0",
+  "description": "Get expenses Lambda function",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {},
+  "scripts": {
+    "package": "zip -r getExpenses.zip index.js"
+  }
+}

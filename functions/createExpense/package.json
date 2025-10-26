@@ -1,0 +1,11 @@
+{
+  "name": "createExpense",
+  "version": "1.0.0",
+  "description": "Create expense Lambda function",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {},
+  "scripts": {
+    "package": "zip -r createExpense.zip index.js"
+  }
+}

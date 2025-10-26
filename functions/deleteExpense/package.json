@@ -1,0 +1,11 @@
+{
+  "name": "deleteExpense",
+  "version": "1.0.0",
+  "description": "Delete expense Lambda function",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {},
+  "scripts": {
+    "package": "zip -r deleteExpense.zip index.js"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "updateExpense",
+  "version": "1.0.0",
+  "description": "Update expense Lambda function",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {},
+  "scripts": {
+    "package": "zip -r updateExpense.zip index.js"
+  }
+}

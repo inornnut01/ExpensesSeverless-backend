@@ -1,0 +1,109 @@
+import { ExpensesService } from "/opt/nodejs/services/expenses.service.js";
+import {
+  successResponse,
+  errorResponse,
+  corsResponse,
+} from "/opt/nodejs/utils/response.js";
+import { authHelper } from "/opt/nodejs/utils/authHelper.js";
+// Initialize service
+const expensesService = new ExpensesService();
+// Main Lambda handler
+export const handler = async (event, context) => {
+  console.log("Event:", JSON.stringify(event, null, 2));
+  try {
+    // Handle CORS preflight request
+    if (event.httpMethod === "OPTIONS") {
+      return corsResponse();
+    }
+    // Validate HTTP method
+    if (event.httpMethod !== "PUT") {
+      return errorResponse(405, "Method not allowed. Use PUT request.");
+    }
+    // Validate authentication
+    let userId;
+    try {
+      const authResult = authHelper.validateAuthMock(event.headers);
+      userId = authResult.userId;
+    } catch (authError) {
+      return errorResponse(
+        401,
+        `Authentication failed: ${
+          authError instanceof Error ? authError.message : "Unknown error"
+        }`
+      );
+    }
+    // Get expense ID from path parameters
+    const expenseId = event.pathParameters?.id;
+    if (!expenseId) {
+      return errorResponse(400, "Expense ID is required in path parameters");
+    }
+    // Parse request body
+    if (!event.body) {
+      return errorResponse(400, "Request body is required");
+    }
+    let updateData;
+    try {
+      updateData = JSON.parse(event.body);
+    } catch (parseError) {
+      return errorResponse(400, "Invalid JSON in request body");
+    }
+    // Validate update data
+    if (Object.keys(updateData).length === 0) {
+      return errorResponse(
+        400,
+        "At least one field must be provided for update"
+      );
+    }
+    // Validate data types if provided
+    if (updateData.amount !== undefined) {
+      if (typeof updateData.amount !== "number" || updateData.amount <= 0) {
+        return errorResponse(400, "Amount must be a positive number");
+      }
+    }
+    if (updateData.category !== undefined) {
+      if (
+        typeof updateData.category !== "string" ||
+        updateData.category.trim() === ""
+      ) {
+        return errorResponse(400, "Category must be a non-empty string");
+      }
+      updateData.category = updateData.category.trim();
+    }
+    if (updateData.description !== undefined) {
+      if (
+        typeof updateData.description !== "string" ||
+        updateData.description.trim() === ""
+      ) {
+        return errorResponse(400, "Description must be a non-empty string");
+      }
+      updateData.description = updateData.description.trim();
+    }
+    // Check if expense exists
+    const existingExpense = await expensesService.getExpenseById(
+      userId,
+      expenseId
+    );
+    if (!existingExpense) {
+      return errorResponse(404, "Expense not found");
+    }
+    // Update expense using service
+    const updatedExpense = await expensesService.updateExpense(
+      userId,
+      expenseId,
+      updateData
+    );
+    // Return success response
+    return successResponse(200, {
+      message: "Expense updated successfully",
+      expense: updatedExpense,
+    });
+  } catch (error) {
+    console.error("Handler error:", error);
+    return errorResponse(
+      500,
+      `Internal server error: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
+};
