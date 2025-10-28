@@ -82,7 +82,7 @@ export const handler = async (
     if (date) {
       const parsedDate = new Date(date);
       if (isNaN(parsedDate.getTime())) {
-        return errorResponse(400, "Invalid date format. Use ISO 8601 format.");
+        return errorResponse(400, "Invalid date format.");
       }
       expenseDate = parsedDate.toISOString();
     }

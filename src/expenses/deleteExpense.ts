@@ -20,7 +20,6 @@ export const handler = async (
   console.log("Event:", JSON.stringify(event, null, 2));
 
   try {
-    // Handle CORS preflight request
     if (event.httpMethod === "OPTIONS") {
       return corsResponse();
     }

@@ -28,7 +28,7 @@ export class AuthHelper {
     const token = authHeader.replace("Bearer ", "");
 
     if (!token) {
-      throw new Error("No token provided");
+      throw new Error("Invalid token");
     }
 
     try {
@@ -51,7 +51,7 @@ export class AuthHelper {
         username,
       };
     } catch (error) {
-      console.error("Token validation error:", error);
+      console.error("Token validation error:");
       if (error instanceof Error) {
         throw new Error(`Token validation failed: ${error.message}`);
       }

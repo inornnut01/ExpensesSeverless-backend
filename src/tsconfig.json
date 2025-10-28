@@ -11,7 +11,7 @@
     "outDir": "./dist",
     "rootDir": ".",
     "resolveJsonModule": true,
-    "types": ["node"]
+    "types": ["node", "jest"]
   },
   "include": ["./**/*"],
   "exclude": ["node_modules", "dist", "layers", "functions"]
