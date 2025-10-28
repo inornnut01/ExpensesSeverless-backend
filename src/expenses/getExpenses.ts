@@ -11,10 +11,8 @@ import {
 } from "../utils/response.js";
 import { authHelper } from "../utils/authHelper.js";
 
-// Initialize service
 const expensesService = new ExpensesService();
 
-// Main Lambda handler
 export const handler = async (
   event: APIGatewayProxyEvent,
   context: Context
@@ -22,12 +20,10 @@ export const handler = async (
   console.log("Event:", JSON.stringify(event, null, 2));
 
   try {
-    // Handle CORS preflight request
     if (event.httpMethod === "OPTIONS") {
       return corsResponse();
     }
 
-    // Validate HTTP method
     if (event.httpMethod !== "GET") {
       return errorResponse(405, "Method not allowed. Use GET request.");
     }
@@ -35,7 +31,7 @@ export const handler = async (
     // Validate authentication
     let userId: string;
     try {
-      const authResult = authHelper.validateAuthMock(event.headers);
+      const authResult = await authHelper.validateCognitoToken(event.headers);
       userId = authResult.userId;
     } catch (authError) {
       return errorResponse(
@@ -56,7 +52,6 @@ export const handler = async (
       type: queryParams.type as "income" | "expense" | undefined,
     };
 
-    // Validate type filter if provided
     if (
       filters.type &&
       filters.type !== "income" &&

@@ -46,7 +46,7 @@ export class AuthHelper {
       const username = userInfo.Username;
 
       return {
-        userId: userInfo.Username!, // Use username as userId
+        userId: userInfo.Username!,
         email,
         username,
       };
@@ -58,22 +58,6 @@ export class AuthHelper {
       throw new Error("Token validation failed");
     }
   }
-
-  // Mock auth for development (remove in production)
-  validateAuthMock(headers: any): AuthResult {
-    const authHeader = headers.Authorization || headers.authorization;
-
-    if (!authHeader) {
-      throw new Error("No authorization header provided");
-    }
-
-    return {
-      userId: "user-123",
-      email: "test@example.com",
-      username: "testuser",
-    };
-  }
 }
 
-// Export singleton instance
 export const authHelper = new AuthHelper();

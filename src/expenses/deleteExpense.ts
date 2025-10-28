@@ -11,10 +11,8 @@ import {
 } from "../utils/response.js";
 import { authHelper } from "../utils/authHelper.js";
 
-// Initialize service
 const expensesService = new ExpensesService();
 
-// Main Lambda handler
 export const handler = async (
   event: APIGatewayProxyEvent,
   context: Context
@@ -27,15 +25,13 @@ export const handler = async (
       return corsResponse();
     }
 
-    // Validate HTTP method
     if (event.httpMethod !== "DELETE") {
       return errorResponse(405, "Method not allowed. Use DELETE request.");
     }
 
-    // Validate authentication
     let userId: string;
     try {
-      const authResult = authHelper.validateAuthMock(event.headers);
+      const authResult = await authHelper.validateCognitoToken(event.headers);
       userId = authResult.userId;
     } catch (authError) {
       return errorResponse(
@@ -46,13 +42,11 @@ export const handler = async (
       );
     }
 
-    // Get expense ID from path parameters
     const expenseId = event.pathParameters?.expenseId;
     if (!expenseId) {
       return errorResponse(400, "Expense ID is required in path parameters");
     }
 
-    // Check if expense exists
     const existingExpense = await expensesService.getExpenseById(
       userId,
       expenseId
@@ -61,10 +55,8 @@ export const handler = async (
       return errorResponse(404, "Expense not found");
     }
 
-    // Delete expense using service
     await expensesService.deleteExpense(userId, expenseId);
 
-    // Return success response
     return successResponse(200, {
       message: "Expense deleted successfully",
       deletedExpenseId: expenseId,

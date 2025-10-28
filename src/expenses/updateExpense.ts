@@ -11,38 +11,26 @@ import {
 } from "../utils/response.js";
 import { authHelper } from "../utils/authHelper.js";
 
-// Initialize service
 const expensesService = new ExpensesService();
 
-// Main Lambda handler
 export const handler = async (
   event: APIGatewayProxyEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> => {
   console.log("Event:", JSON.stringify(event, null, 2));
 
-  console.log(
-    "Path Parameters:",
-    JSON.stringify(event.pathParameters, null, 2)
-  );
-  console.log("Path:", event.path);
-  console.log("Resource:", event.resource);
-
   try {
-    // Handle CORS preflight request
     if (event.httpMethod === "OPTIONS") {
       return corsResponse();
     }
 
-    // Validate HTTP method
     if (event.httpMethod !== "PUT") {
       return errorResponse(405, "Method not allowed. Use PUT request.");
     }
 
-    // Validate authentication
     let userId: string;
     try {
-      const authResult = authHelper.validateAuthMock(event.headers);
+      const authResult = await authHelper.validateCognitoToken(event.headers);
       userId = authResult.userId;
     } catch (authError) {
       return errorResponse(
@@ -53,13 +41,11 @@ export const handler = async (
       );
     }
 
-    // Get expense ID from path parameters
     const expenseId = event.pathParameters?.expenseId;
     if (!expenseId) {
       return errorResponse(400, "Expense ID is required in path parameters");
     }
 
-    // Parse request body
     if (!event.body) {
       return errorResponse(400, "Request body is required");
     }
@@ -71,7 +57,6 @@ export const handler = async (
       return errorResponse(400, "Invalid JSON in request body");
     }
 
-    // Validate update data
     if (Object.keys(updateData).length === 0) {
       return errorResponse(
         400,
@@ -79,7 +64,6 @@ export const handler = async (
       );
     }
 
-    // Validate data types if provided
     if (updateData.amount !== undefined) {
       if (typeof updateData.amount !== "number" || updateData.amount <= 0) {
         return errorResponse(400, "Amount must be a positive number");
@@ -112,7 +96,6 @@ export const handler = async (
       }
     }
 
-    // Check if expense exists
     const existingExpense = await expensesService.getExpenseById(
       userId,
       expenseId
@@ -121,14 +104,12 @@ export const handler = async (
       return errorResponse(404, "Expense not found");
     }
 
-    // Update expense using service
     const updatedExpense = await expensesService.updateExpense(
       userId,
       expenseId,
       updateData
     );
 
-    // Return success response
     return successResponse(200, {
       message: "Expense updated successfully",
       expense: updatedExpense,
