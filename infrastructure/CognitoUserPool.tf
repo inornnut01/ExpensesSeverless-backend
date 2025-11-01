@@ -7,7 +7,7 @@ resource "aws_cognito_user_pool" "expenses_user_pool" {
     minimum_length    = 8
     require_lowercase = true
     require_numbers   = true
-    require_symbols   = true
+    require_symbols   = false
     require_uppercase = true
   }
 
@@ -15,12 +15,11 @@ resource "aws_cognito_user_pool" "expenses_user_pool" {
   schema {
     name                = "email"
     attribute_data_type = "String"
-    required           = true
-    mutable            = true
+    required            = true
+    mutable             = true
   }
 
   auto_verified_attributes = ["email"]
-  username_attributes      = ["email"]
 
   user_attribute_update_settings {
     attributes_require_verification_before_update = ["email"]

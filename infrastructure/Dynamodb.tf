@@ -1,10 +1,10 @@
 module "expense_dynamodb_table" {
-  source   = "terraform-aws-modules/dynamodb-table/aws"
+  source = "terraform-aws-modules/dynamodb-table/aws"
 
-  name     = var.aws_dynamodb_table
+  name         = var.aws_dynamodb_table
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "userId"
-  range_key = "id"
+  hash_key     = "userId"
+  range_key    = "id"
 
   attributes = [
     {

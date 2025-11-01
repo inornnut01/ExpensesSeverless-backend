@@ -1,13 +1,19 @@
 # Lambda Layer for shared dependencies
 module "lambda_layer_shared" {
-  source = "terraform-aws-modules/lambda/aws"
+  source  = "terraform-aws-modules/lambda/aws"
 
   create_layer = true
-  layer_name   = "expenses-shared-layer"
+  layer_name   = "expenses-shared-layer-v2"
   description  = "Shared dependencies for expense tracker functions"
 
   compatible_runtimes = ["nodejs22.x"]
-  source_path         = "../src/dist/nodejs"
+  source_path         = [
+    {
+      path = "${path.module}/../src/dist/nodejs"
+      prefix_in_zip = "nodejs"
+    }
+  ]
+  architectures       = ["x86_64"]
 
   tags = {
     Name = "Serverless Expenses Layer"
@@ -24,23 +30,14 @@ module "lambda_create_expense" {
   runtime       = "nodejs22.x"
   architectures = ["x86_64"]
 
-  source_path = [
-    {
-      path = "../src/dist/expenses/createExpense.js"
-      patterns = [
-        "!.*",
-        "createExpense\\.js$",
-        "createExpense\\.js\\.map$"
-      ]
-    }
-  ]
-  layers      = [module.lambda_layer_shared.lambda_layer_arn]
+  source_path = "../src/dist/expenses/createExpense.mjs"
+
+  layers = [module.lambda_layer_shared.lambda_layer_arn]
 
   environment_variables = {
-  EXPENSES_TABLE_NAME = var.aws_dynamodb_table
-  AWS_REGION          = var.aws_region
-  NODE_OPTIONS        = "--enable-source-maps"
-}
+    EXPENSES_TABLE_NAME = var.aws_dynamodb_table
+    NODE_OPTIONS        = "--enable-source-maps"
+  }
 
   attach_policy_json = true
   policy_json = jsonencode({
@@ -81,21 +78,12 @@ module "lambda_get_expenses" {
   runtime       = "nodejs22.x"
   architectures = ["x86_64"]
 
-  source_path = [
-    {
-      path = "../src/dist/expenses/getExpenses.js"
-      patterns = [
-        "!.*",
-        "getExpenses\\.js$",
-        "getExpenses\\.js\\.map$"
-      ]
-    }
-  ]
-  layers      = [module.lambda_layer_shared.lambda_layer_arn]
+  source_path = "../src/dist/expenses/getExpenses.mjs"
+
+  layers = [module.lambda_layer_shared.lambda_layer_arn]
 
   environment_variables = {
     EXPENSES_TABLE_NAME = var.aws_dynamodb_table
-    AWS_REGION          = var.aws_region
     NODE_OPTIONS        = "--enable-source-maps"
   }
 
@@ -139,21 +127,12 @@ module "lambda_update_expense" {
   runtime       = "nodejs22.x"
   architectures = ["x86_64"]
 
-  source_path = [
-    {
-      path = "../src/dist/expenses/updateExpense.js"
-      patterns = [
-        "!.*",
-        "updateExpense\\.js$",
-        "updateExpense\\.js\\.map$"
-      ]
-    }
-  ]
-  layers      = [module.lambda_layer_shared.lambda_layer_arn]
+  source_path = "../src/dist/expenses/updateExpense.mjs"
+
+  layers = [module.lambda_layer_shared.lambda_layer_arn]
 
   environment_variables = {
     EXPENSES_TABLE_NAME = var.aws_dynamodb_table
-    AWS_REGION          = var.aws_region
     NODE_OPTIONS        = "--enable-source-maps"
   }
 
@@ -165,7 +144,8 @@ module "lambda_update_expense" {
         Effect = "Allow"
         Action = [
           "dynamodb:UpdateItem",
-          "dynamodb:GetItem"
+          "dynamodb:GetItem",
+          "dynamodb:Query"
         ]
         Resource = module.expense_dynamodb_table.dynamodb_table_arn
       },
@@ -196,21 +176,12 @@ module "lambda_delete_expense" {
   runtime       = "nodejs22.x"
   architectures = ["x86_64"]
 
-  source_path = [
-    {
-      path = "../src/dist/expenses/deleteExpense.js"
-      patterns = [
-        "!.*",
-        "deleteExpense\\.js$",
-        "deleteExpense\\.js\\.map$"
-      ]
-    }
-  ]
-  layers      = [module.lambda_layer_shared.lambda_layer_arn]
+  source_path = "../src/dist/expenses/deleteExpense.mjs"
+
+  layers = [module.lambda_layer_shared.lambda_layer_arn]
 
   environment_variables = {
     EXPENSES_TABLE_NAME = var.aws_dynamodb_table
-    AWS_REGION          = var.aws_region
     NODE_OPTIONS        = "--enable-source-maps"
   }
 
@@ -222,7 +193,8 @@ module "lambda_delete_expense" {
         Effect = "Allow"
         Action = [
           "dynamodb:DeleteItem",
-          "dynamodb:GetItem"
+          "dynamodb:GetItem",
+          "dynamodb:Query"
         ]
         Resource = module.expense_dynamodb_table.dynamodb_table_arn
       },

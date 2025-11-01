@@ -39,3 +39,26 @@ crash.*.log
 *.swo
 *~
 
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+build/
+builds/
+.DS_Store
+coverage/
+.serverless/
+*.log
+
+# Terraform files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+*.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
