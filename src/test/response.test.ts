@@ -52,8 +52,8 @@ describe("Response Utilities", () => {
       expect(result.headers?.["Access-Control-Allow-Origin"]).toBe("*");
       expect(result.headers?.["Content-Type"]).toBe("application/json");
 
-      // Should not include Allow-Methods (only in CORS preflight)
-      expect(result.headers?.["Access-Control-Allow-Methods"]).toBeUndefined();
+      // CORS Methods header should be present for browser compatibility
+      expect(result.headers?.["Access-Control-Allow-Methods"]).toContain("GET");
     });
 
     it("should handle different error status codes", () => {

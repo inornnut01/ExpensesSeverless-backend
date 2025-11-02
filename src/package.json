@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node scripts/transform-lambda-paths.js",
     "deploy": "serverless deploy",
     "local": "serverless offline",
     "test": "jest",
