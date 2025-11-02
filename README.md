@@ -191,12 +191,12 @@ src/dist/
 
 All endpoints require authentication via Cognito JWT token in the `Authorization` header.
 
-| Method   | Endpoint         | Description                                | Authentication |
-| -------- | ---------------- | ------------------------------------------ | -------------- |
-| `POST`   | `/expenses`      | Create a new expense/income entry          | Required       |
-| `GET`    | `/expenses`      | Retrieve expenses with filters and summary | Required       |
-| `PUT`    | `/expenses/{id}` | Update an existing expense                 | Required       |
-| `DELETE` | `/expenses/{id}` | Delete an expense                          | Required       |
+| Method   | Endpoint                       | Description                                | Authentication |
+| -------- | ------------------------------ | ------------------------------------------ | -------------- |
+| `POST`   | `/expenses/create`             | Create a new expense/income entry          | Required       |
+| `GET`    | `/expenses/get`                | Retrieve expenses with filters and summary | Required       |
+| `PUT`    | `/expenses/update/{expenseId}` | Update an existing expense                 | Required       |
+| `DELETE` | `/expenses/delete/{expenseId}` | Delete an expense                          | Required       |
 
 **Response includes:**
 
